@@ -40,7 +40,7 @@ class MysqlTableInfo:
 
     def get_table_name(self, db_name: str):
         db_name = not_null(db_name)
-        query = QUERY['all_table'].replace('##DB_Name##', db_name)
+        query = QUERY['all_table'].replace('##DB_NAME##', db_name)
         with self.mydb.cursor() as mycursor:
             mycursor.execute(query)
             table_names = mycursor.fetchall()
@@ -49,10 +49,9 @@ class MysqlTableInfo:
     def get_field_name(self, db_name: str, table_name: str):
         db_name = not_null(db_name)
         table_name = not_null(table_name)
-        qury = QUERY['table_filed']
+        query = QUERY['table_filed'].replace('##DB_NAME##', db_name).replace('##TABLE_NAME##', table_name)
         with self.mydb.cursor() as mycursor:
-            mycursor.execute(
-                f"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{db_name}' AND TABLE_NAME = '{table_name}';")
+            mycursor.execute(query)
             table_field = mycursor.fetchall()
         return table_field
 
