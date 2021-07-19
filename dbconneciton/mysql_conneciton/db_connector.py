@@ -8,7 +8,7 @@ from configparser import ConfigParser
 CONFIG = ConfigParser()
 CONFIG.read('../PYENTITY/config.ini')
 
-
+QUERY = CONFIG['MySql_query']
 
 def not_null(x: Any):
     assert isinstance(x, str)
@@ -32,7 +32,7 @@ class MysqlTableInfo:
 
     
     def get_all_database_name(self):
-        query = ""
+        query = QUERY["all_db"]
         with self.mydb.cursor() as mycursor:
             mycursor.execute(query)
             database_name = mycursor.fetchall()
@@ -40,15 +40,16 @@ class MysqlTableInfo:
 
     def get_table_name(self, db_name: str):
         db_name = not_null(db_name)
+        query = QUERY['all_table'].replace('##DB_Name##', db_name)
         with self.mydb.cursor() as mycursor:
-            mycursor.execute(
-                f"SELECT TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA NOT IN ('sys', 'information_schema', 'performance_schema', 'mysql') AND TABLE_SCHEMA = '{db_name}';")
+            mycursor.execute(query)
             table_names = mycursor.fetchall()
         return MysqlTableInfo.to_list(table_names)
 
     def get_field_name(self, db_name: str, table_name: str):
         db_name = not_null(db_name)
         table_name = not_null(table_name)
+        qury = QUERY['table_filed']
         with self.mydb.cursor() as mycursor:
             mycursor.execute(
                 f"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{db_name}' AND TABLE_NAME = '{table_name}';")
